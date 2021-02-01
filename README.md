@@ -18,7 +18,7 @@ This are a couple screenshots of the endpoint responses
 
 GET - Block by it's height "\block\:height"
 
-![](public/img/genesis-block.png)
+![](public/img/genesis-block.PNG)
 
 In this project you will have a boilerplate code with a REST Api already setup to expose some of the functionalities
 you will implement in your private blockchain.
