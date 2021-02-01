@@ -45,7 +45,7 @@ class Block {
 
           self.hash = currenHash;
 
-          if (currenHash == hashToCompare) {
+          if (currenHash!== hashToCompare) {
             return resolve(true);
           } else {
             return resolve(false);
