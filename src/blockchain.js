@@ -205,16 +205,33 @@
             let self = this;
             let errorLog = [];
             return new Promise(async (resolve, reject) => {
-                try {
-                    await self.chain.forEach(eachBlock => {
-                        console.log(eachBlock.validate());
-                    })
-                } catch (error) {
-                    errorLog.push(error)
-                }
+                await Promise.all(self.chain.map(async currentBlock => {
+                    if(currentBlock.height === 0) {
+                        await currentBlock.validate() ? true : errorLog.push("There is a problem with the Genesis Block!");
+                    } else {
+                        await currentBlock.validate() ? true : errorLog.push(`Block ${currentBlock.height} hash does not validate`);
+                        currentBlock.previousBlockHash === self.chain[currentBlock.height-1].hash ? true : errorLog.push(`Block ${currentItem.height} previous hash does not validate`);
+                    }
+                }));
+                resolve(errorLog);
             });
         }
 
+        getAllBlockchain(){
+            let self = this;
+            return new Promise(async(resolve, reject) => {
+                try {
+                    let allBlockchain = self.chain
+                    if (allBlockchain) {
+                        resolve(allBlockchain)
+                    } else {
+                        reject('BLOCKCHAIN NOT FOUND!!')
+                    }
+                } catch (error) {
+                    reject(error)
+                }
+            })
+        }
     }
 
 module.exports = {Blockchain};   
