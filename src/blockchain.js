@@ -75,6 +75,7 @@
                     block.time = new Date().getTime().toString().slice(0, -3);
                     block.height = self.chain.length
                     self.height++;
+                    self.validateChain();
                     self.chain.push(block);
                     resolve(block)
                 } catch (error) {
@@ -121,16 +122,20 @@
                 try {
                     let messageTime = parseInt(message.split(':')[1]);
                     let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
-                    if ((messageTime + (5*60*1000)) >= currentTime) {
-                        let valid = bitcoinMessage.verify(message, address, signature)
-                        if(valid){
-                            let block = new Block({owner: address, star: star})
-                            let addBlock = await self._addBlock(block);
-                            resolve(addBlock)
-                        } else {
-                            reject('Your signature is not valid!')
-                        }
+                    if ((currentTime - messageTime) > 300) {
+                        reject('Time has ended, elapsed time is now longer than 5 minutes')
+                    } 
+                    let verified = await bitcoinMessage.verify(message, address, signature)
+                    if(!verified){
+                        reject('There was an issue with the verification!')
                     }
+                    let newBlock  =  new Block({
+                        owner: address,
+                        star
+                      });
+                      
+                    await self._addBlock(newBlock)
+                    resolve(newBlock);
                 } catch (error) {
                     reject(error)
                 }
@@ -205,18 +210,22 @@
             let self = this;
             let errorLog = [];
             return new Promise(async (resolve, reject) => {
-                await Promise.all(self.chain.map(async currentBlock => {
-                    if(currentBlock.height === 0) {
-                        await currentBlock.validate() ? true : errorLog.push("There is a problem with the Genesis Block!");
-                    } else {
-                        await currentBlock.validate() ? true : errorLog.push(`Block ${currentBlock.height} is not valid`);
-                        currentBlock.previousBlockHash === self.chain[currentBlock.height-1].hash ? true : errorLog.push(`Block ${currentItem.height} previous hash is not valid`);
-                    }
-                }));
-                resolve(errorLog);
+                try {
+                    await Promise.all(self.chain.map(async currentBlock => {
+                        if(currentBlock.height === 0) {
+                            await currentBlock.validate() ? true : errorLog.push("There is a problem with the Genesis Block!");
+                        } else {
+                            await currentBlock.validate() ? true : errorLog.push(`Block ${currentBlock.height} is not valid`);
+                            currentBlock.previousBlockHash === self.chain[currentBlock.height-1].hash ? true : errorLog.push(`Block ${currentItem.height} previous hash is not valid`);
+                        }
+                    }));
+                } catch (error) {
+                    reject(error)
+                }
+                resolve(errorLog)
             });
         }
-
+        //This method only returns all of the blockchain
         getAllBlockchain(){
             let self = this;
             return new Promise(async(resolve, reject) => {
