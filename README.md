@@ -12,6 +12,14 @@ Concepts like:
 Are some of the most important components in the Blockchain Framework that you will need to describe and also
 why not? Implement too.
 
+# Results
+
+This are a couple screenshots of the endpoint responses
+
+GET - Block by it's height "\block\:height"
+
+![](public/img/genesis-block.png)
+
 In this project you will have a boilerplate code with a REST Api already setup to expose some of the functionalities
 you will implement in your private blockchain.
 
