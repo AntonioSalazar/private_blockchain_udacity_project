@@ -209,8 +209,8 @@
                     if(currentBlock.height === 0) {
                         await currentBlock.validate() ? true : errorLog.push("There is a problem with the Genesis Block!");
                     } else {
-                        await currentBlock.validate() ? true : errorLog.push(`Block ${currentBlock.height} hash does not validate`);
-                        currentBlock.previousBlockHash === self.chain[currentBlock.height-1].hash ? true : errorLog.push(`Block ${currentItem.height} previous hash does not validate`);
+                        await currentBlock.validate() ? true : errorLog.push(`Block ${currentBlock.height} is not valid`);
+                        currentBlock.previousBlockHash === self.chain[currentBlock.height-1].hash ? true : errorLog.push(`Block ${currentItem.height} previous hash is not valid`);
                     }
                 }));
                 resolve(errorLog);
